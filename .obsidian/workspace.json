@@ -1,0 +1,208 @@
+{
+  "main": {
+    "id": "1107138dc3ddfa43",
+    "type": "split",
+    "children": [
+      {
+        "id": "5191b36f39edb2b2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3748210300911d34",
+            "type": "leaf",
+            "state": {
+              "type": "excalidraw",
+              "state": {
+                "file": "Architecture/High Level Architecture.excalidraw"
+              },
+              "icon": "excalidraw-icon",
+              "title": "High Level Architecture"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "ad204ddbf8a61838",
+    "type": "split",
+    "children": [
+      {
+        "id": "ef39e56286978ac1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f182d73bc817c32b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "f5483d3ba169f01e",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "b9137c1132de47f7",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "right": {
+    "id": "8afc61279ea3adb0",
+    "type": "split",
+    "children": [
+      {
+        "id": "e863079d1f3f99cc",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "374d22d32e4de915",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Architecture/00 - Architecture Overview.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 00 - Architecture Overview"
+            }
+          },
+          {
+            "id": "10bbe046765690bc",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Architecture/00 - Architecture Overview.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 00 - Architecture Overview"
+            }
+          },
+          {
+            "id": "b24f4eacb52820c3",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "1fba84f544f8fee2",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "cce77834381fbbc7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Architecture/00 - Architecture Overview.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 00 - Architecture Overview"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "obsidian-excalidraw-plugin:New drawing": false
+    }
+  },
+  "active": "3748210300911d34",
+  "lastOpenFiles": [
+    "Architecture/Core Req.excalidraw",
+    "Architecture/Backend.excalidraw",
+    "Architecture/00 - Architecture Overview.md",
+    "Architecture/03 - API Design.md",
+    "Architecture/05 - Real-time Chat.md",
+    "Architecture/06 - Deployment.md",
+    "Architecture/04 - Auth.md",
+    "Architecture/02 - Database.md",
+    "Architecture/01 - Features.md",
+    "Untitled.base",
+    "Architecture/High Level Architecture.excalidraw",
+    "Architecture/DB Relation.excalidraw",
+    "Architecture/Backend.canvas",
+    "Architecture/Core Req.canvas",
+    "Architecture/DB Relation.canvas",
+    "Architecture/High Level Architecture.canvas",
+    "Architecture/Excalidraw/Drawing 2026-05-17 19.50.14.excalidraw.md",
+    "UIC_Social_Marketplace_Technical_Plan.pdf",
+    "Architecture/Untitled.md",
+    "Architecture/Excalidraw"
+  ]
+}

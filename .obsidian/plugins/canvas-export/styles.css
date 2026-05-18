@@ -1,0 +1,58 @@
+.canvas-export-modal .format-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px 24px;
+	margin-bottom: 16px;
+}
+
+.canvas-export-modal .format-grid label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+}
+
+.canvas-export-modal .setting-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.canvas-export-modal .setting-row label {
+	min-width: 120px;
+}
+
+.canvas-export-modal .setting-row input[type="number"] {
+	width: 70px;
+}
+
+.canvas-export-modal .output-options {
+	margin-bottom: 16px;
+}
+
+.canvas-export-modal .output-options label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 6px;
+	cursor: pointer;
+}
+
+.canvas-export-modal .subfolder-input {
+	margin-left: 24px;
+	width: calc(100% - 24px);
+}
+
+.canvas-export-modal .export-btn-container {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 16px;
+}
+
+.canvas-export-overwrite-buttons {
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+	margin-top: 16px;
+}

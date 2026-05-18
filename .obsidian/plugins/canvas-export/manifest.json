@@ -1,0 +1,9 @@
+{
+	"id": "canvas-export",
+	"name": "Canvas Export",
+	"version": "1.0.2",
+	"minAppVersion": "1.4.0",
+	"description": "Export canvas files to HTML, Excalidraw, Mermaid, D2, and PDF.",
+	"author": "Robin Moffatt",
+	"isDesktopOnly": true
+}

@@ -13,15 +13,15 @@
             "state": {
               "type": "canvas",
               "state": {
-                "file": "DB Relation.canvas",
+                "file": "High Level Architecture.canvas",
                 "viewState": {
-                  "x": 143.5959213645182,
-                  "y": -567.7760616107539,
-                  "zoom": -0.6666666666666667
+                  "x": -57.5,
+                  "y": -116.5,
+                  "zoom": 0
                 }
               },
               "icon": "lucide-layout-dashboard",
-              "title": "DB Relation"
+              "title": "High Level Architecture"
             }
           }
         ]
@@ -183,13 +183,19 @@
       "bases:Create new base": false
     }
   },
-  "active": "ef2e2ad9d90ce0ae",
+  "active": "920907f67f879cef",
   "lastOpenFiles": [
     "Untitled.md",
-    "DB Relation.canvas",
-    "Backend.canvas",
-    "03 - API Design.md",
     "High Level Architecture.canvas",
+    "DB Relation.canvas",
+    "Core Req.canvas",
+    "Backend.canvas",
+    "00 - Architecture Overview.md",
+    "02 - Database.md",
+    "01 - Features.md",
+    "04 - Auth.md",
+    "03 - API Design.md",
+    "05 - Real-time Chat.md",
     "Untitled 1.base",
     "Untitled.base",
     "CampusPal structure.md",
