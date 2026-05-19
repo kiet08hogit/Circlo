@@ -1,0 +1,153 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =======================
+// ENUMS
+// =======================
+
+enum ListingCategory {
+  ITEM
+  SERVICE
+  TICKET
+  GIG
+  RENTAL
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  REMOVED
+}
+
+enum PostType {
+  LOOKING_FOR
+  OFFERING
+  QUESTION
+}
+
+enum InteractionType {
+  LIKE
+  SKIP
+}
+
+// =======================
+// MODELS
+// =======================
+
+model User {
+  id          String   @id @default(uuid())
+  clerkUserId String   @unique
+  email       String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships (Prisma uses these to join tables under the hood)
+  listings            Listing[]
+  posts               Post[]
+  interactions        Interaction[]
+  conversationMembers ConversationMember[]
+  messages            Message[]
+}
+
+model Listing {
+  id          String          @id @default(uuid())
+  title       String
+  description String
+  price       Float           // Storing price as a Float or Decimal
+  category    ListingCategory
+  status      ListingStatus   @default(ACTIVE)
+  
+  // Foreign Key linking to the User who created it
+  sellerId    String
+  seller      User            @relation(fields: [sellerId], references: [id])
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relationships
+  images       ListingImage[]
+  interactions Interaction[]
+}
+
+model ListingImage {
+  id        String   @id @default(uuid())
+  url       String
+  
+  // Foreign Key to Listing. 'onDelete: Cascade' means if the listing is deleted, delete its images too.
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  postType  PostType
+  
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Interaction {
+  id        String          @id @default(uuid())
+  type      InteractionType
+  
+  userId    String
+  user      User            @relation(fields: [userId], references: [id])
+  
+  listingId String
+  listing   Listing         @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime        @default(now())
+
+  // Constraint: A user can only interact (like/skip) with a specific listing once
+  @@unique([userId, listingId])
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members   ConversationMember[]
+  messages  Message[]
+}
+
+model ConversationMember {
+  id             String       @id @default(uuid())
+  
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+
+  joinedAt       DateTime     @default(now())
+
+  // Constraint: A user can only join the exact same conversation once
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  content        String
+  
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+
+  createdAt      DateTime     @default(now())
+}
