@@ -1,8 +1,14 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
-import { verifyToken, users } from '@clerk/backend';
+import { verifyToken, createClerkClient } from '@clerk/backend';
 
 @Injectable()
 export class ClerkAuthGuard implements CanActivate {
+  private clerkClient;
+
+  constructor() {
+    this.clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+  }
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
@@ -14,6 +20,17 @@ export class ClerkAuthGuard implements CanActivate {
 
     const token = authHeader.split(' ')[1];
 
+    // Development backdoor for Postman testing
+    /*
+    if (process.env.NODE_ENV !== 'production' && token === 'dev-token') {
+      request.user = {
+        clerkUserId: 'dev_user_12345',
+        email: 'dev@uic.edu',
+      };
+      return true;
+    }
+    */
+
     try {
       // 2. Verify the token using Clerk
       const verifiedSession = await verifyToken(token, {
@@ -21,7 +38,7 @@ export class ClerkAuthGuard implements CanActivate {
       });
 
       // 3. Get the user from Clerk to check their email
-      const clerkUser = await users.getUser(verifiedSession.sub);
+      const clerkUser = await this.clerkClient.users.getUser(verifiedSession.sub);
       const primaryEmail = clerkUser.emailAddresses.find(
         (email) => email.id === clerkUser.primaryEmailAddressId
       )?.emailAddress;

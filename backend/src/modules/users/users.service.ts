@@ -27,11 +27,16 @@ export class UsersService {
         return this.prisma.user.findUnique({ where: { id } });
     }
 
-    async updateUser(userId: string, updateData: any) {
+    async updateUser(clerkUserId: string, updateData: any) {
         return this.prisma.user.update({
-            where: { id: userId },
+            where: { clerkUserId },
             data: updateData,
         });
     }
 
+    async deleteUserByClerkId(clerkUserId: string) {
+        return this.prisma.user.delete({
+            where: { clerkUserId },
+        });
+    }
 }

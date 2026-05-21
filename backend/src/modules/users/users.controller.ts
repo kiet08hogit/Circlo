@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, UseGuards, Param, Body, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Patch, UseGuards, Param, Body, NotFoundException, ConflictException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ClerkAuthGuard } from '../../common/guards/clerk-auth.guard';
 import { CurrentUser} from '../../common/decorators/current-user.decorator';
@@ -20,7 +20,15 @@ export class UsersController {
     @Patch('me')
     @UseGuards(ClerkAuthGuard)
     async updateProfile(@CurrentUser() clerkUser: any, @Body() updateData: any) {
-        return this.usersService.updateUser(clerkUser.clerkUserId, updateData);
+        try {
+            return await this.usersService.updateUser(clerkUser.clerkUserId, updateData);
+        } catch (error: any) {
+            // Prisma error code for Unique Constraint Violation
+            if (error.code === 'P2002') {
+                throw new ConflictException('Username is already taken.');
+            }
+            throw error;
+        }
     }
 
     @Get(':id')
