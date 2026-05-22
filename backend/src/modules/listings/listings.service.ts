@@ -46,9 +46,13 @@ export class ListingsService {
         });
     }
 
-    async getUserListings(userId: string) {
+    async getUserListings(clerkUserId: string) {
+        const dbUser = await this.prisma.user.findUnique({
+            where: { clerkUserId: clerkUserId },
+        });
+        if (!dbUser) throw new NotFoundException('User not found');
         return this.prisma.listing.findMany({
-            where: { sellerId: userId },
+            where: { sellerId: dbUser.id },
             orderBy: { createdAt: 'desc' },
             include: { images: true },
         });
