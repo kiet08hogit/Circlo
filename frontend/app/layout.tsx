@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton, SignOutButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
+import Link from "next/link";
+import { Search } from "lucide-react";
+import { ClientNav } from "./ClientNav";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,37 +20,40 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" className="h-full">
       <body className="h-full bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50 antialiased">
         <ClerkProvider>
-          {/* Modern translucent glass header */}
-          <header className="sticky top-0 z-50 w-full border-b border-zinc-200/60 bg-white/80 backdrop-blur-md dark:border-zinc-800/60 dark:bg-zinc-950/80">
-            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white font-extrabold text-lg shadow-md shadow-red-600/20">
-                  F
-                </span>
-                <span className="text-xl font-bold tracking-tight">
-                  Flames<span className="bg-gradient-to-r from-red-600 to-rose-500 bg-clip-text text-transparent">Porium</span>
-                </span>
+          {/* Clean White Header */}
+          <header className="sticky top-0 z-50 w-full bg-white border-b border-zinc-200 shadow-sm">
+            <div className="flex h-16 w-full items-center justify-between px-4 sm:px-8 lg:px-10 gap-4">
+              {/* Logo */}
+              <div className="flex items-center shrink-0">
+                <Link href="/listings" className="text-xl sm:text-2xl font-black tracking-tighter text-[#3252DF]">
+                  FlamesPorium
+                </Link>
               </div>
-              <nav className="flex items-center gap-4">
+
+              {/* Middle Section (Categories, Search, Create) */}
+              <Show when="signed-in">
+                <ClientNav />
+              </Show>
+
+              {/* Right Side Actions */}
+              <nav className="flex items-center gap-4 shrink-0">
                 <Show when="signed-out">
-                  <div className="flex items-center gap-3">
-                    <SignInButton mode="modal">
-                      <button className="cursor-pointer text-sm font-semibold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors">
-                        Sign In
-                      </button>
-                    </SignInButton>
-                    <SignUpButton mode="modal">
-                      <button className="cursor-pointer rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 hover:shadow transition-all duration-200">
-                        Sign Up
-                      </button>
-                    </SignUpButton>
-                  </div>
+                  <SignUpButton mode="modal">
+                    <button className="cursor-pointer rounded-full bg-[#3252DF] px-6 py-2 text-sm font-bold text-white transition-all hover:bg-[#2842B3] active:scale-95 shadow-sm">
+                      Sign Up
+                    </button>
+                  </SignUpButton>
+                  <SignInButton mode="modal">
+                    <button className="cursor-pointer rounded-full bg-[#3252DF] px-6 py-2 text-sm font-bold text-white transition-all hover:bg-[#2842B3] active:scale-95 shadow-sm">
+                      Log In
+                    </button>
+                  </SignInButton>
                 </Show>
                 <Show when="signed-in">
                   <div className="flex items-center gap-4">
                     {isUic && (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/10 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="hidden lg:inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 shadow-sm">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
                         UIC Verified
                       </span>
                     )}
