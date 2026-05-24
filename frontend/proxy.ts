@@ -5,7 +5,7 @@ export default clerkMiddleware(async (auth, req) => {
   if (req.nextUrl.pathname === '/') {
     const { userId } = await auth()
     if (userId) {
-      return NextResponse.redirect(new URL('/listings?category=ALL', req.url))
+      return NextResponse.redirect(new URL('/home', req.url))
     }
   }
 })

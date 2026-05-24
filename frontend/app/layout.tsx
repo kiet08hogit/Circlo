@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <div className="flex h-16 w-full items-center justify-between px-4 sm:px-8 lg:px-10 gap-4">
               {/* Logo */}
               <div className="flex items-center shrink-0">
-                <Link href="/listings" className="text-xl sm:text-2xl font-black tracking-tighter text-[#3252DF]">
+                <Link href="/" className="text-xl sm:text-2xl font-black tracking-tighter text-black">
                   Circlo
                 </Link>
               </div>

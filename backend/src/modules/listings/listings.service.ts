@@ -10,7 +10,7 @@ export class ListingsService {
         private storageService: StorageService
     ) { }
 
-    async create(clerkUserId: string, email: string, data: CreateListingDto, file?: any) {
+    async create(clerkUserId: string, email: string, data: CreateListingDto, files?: any[]) {
         let dbuser = await this.prisma.user.findUnique({ where: { clerkUserId } });
         if (!dbuser) {
             dbuser = await this.prisma.user.create({
@@ -29,14 +29,16 @@ export class ListingsService {
             },
         });
 
-        if (file) {
-            const imageUrl = await this.storageService.saveFile(file);
-            await this.prisma.listingImage.create({
-                data: {
-                    url: imageUrl,
-                    listingId: listing.id
-                }
-            });
+        if (files && files.length > 0) {
+            for (const file of files) {
+                const imageUrl = await this.storageService.saveFile(file);
+                await this.prisma.listingImage.create({
+                    data: {
+                        url: imageUrl,
+                        listingId: listing.id
+                    }
+                });
+            }
         }
 
         return listing;

@@ -11,17 +11,25 @@ const CATEGORIES = [
   { id: 'LEISURE', label: 'LEISURE' },
   { id: 'ACCESSORIES', label: 'ACCESSORIES' },
   { id: 'OTHER', label: 'OTHER' },
-  { id: 'ALL', label: 'ALL PRODUCTS' },
+  { id: 'ALL', label: 'HOME' },
 ];
 
 export function ClientNav() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  // Hide the nav bar on individual listing detail pages
+  if (pathname.match(/^\/listings\/.+$/)) {
+    return null;
+  }
   
   // Try to get category from URL if we're on listings, else default to none
-  const currentCategory = pathname === '/listings' 
-    ? (searchParams.get('category') || 'ALL') 
-    : '';
+  let currentCategory = '';
+  if (pathname === '/listings') {
+    currentCategory = searchParams.get('category') || '';
+  } else if (pathname === '/home') {
+    currentCategory = 'ALL';
+  }
 
   // Only show the full navigation row if we are signed in and presumably on marketplace routes
   // But actually, we can show it globally since the layout dictates it.
@@ -36,7 +44,7 @@ export function ClientNav() {
           return (
             <Link
               key={cat.id}
-              href={`/listings?category=${cat.id}`}
+              href={cat.id === 'ALL' ? '/home' : `/listings?category=${cat.id}`}
               className={`whitespace-nowrap font-bold text-xs tracking-widest transition-colors ${
                 isActive 
                   ? 'text-[#DC2626]' 

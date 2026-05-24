@@ -3,10 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
-import { Loader2, Filter, Tag } from 'lucide-react';
+import { Loader2, Tag } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { Button } from "@/components/ui/button";
 
 interface Seller {
   id: string;
@@ -28,20 +26,8 @@ interface Listing {
   images?: { url: string }[];
 }
 
-const CATEGORIES = [
-  { id: 'HOUSING', label: 'DORM' },
-  { id: 'CLOTHES', label: 'CLOTHES' },
-  { id: 'SCHOOL', label: 'SCHOOL' },
-  { id: 'LEISURE', label: 'LEISURE' },
-  { id: 'ACCESSORIES', label: 'ACCESSORIES' },
-  { id: 'OTHER', label: 'OTHER' },
-  { id: 'ALL', label: 'ALL PRODUCTS' },
-];
-
-export default function ListingsGridPage() {
+export default function Home() {
   const { getToken, isLoaded, isSignedIn } = useAuth();
-  const searchParams = useSearchParams();
-  const activeCategory = searchParams.get('category') || 'ALL';
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,11 +37,7 @@ export default function ListingsGridPage() {
       setIsLoading(true);
       try {
         const token = await getToken();
-        // If 'ALL' is selected, don't pass the category query parameter
-        const url = activeCategory === 'ALL'
-          ? 'http://localhost:3000/listings/all'
-          : `http://localhost:3000/listings/all?category=${activeCategory}`;
-
+        const url = 'http://localhost:3000/listings/all';
         const res = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -72,7 +54,7 @@ export default function ListingsGridPage() {
     };
 
     fetchListings();
-  }, [isLoaded, isSignedIn, getToken, activeCategory]);
+  }, [isLoaded, isSignedIn, getToken]);
 
   if (!isLoaded) {
     return (
@@ -84,7 +66,6 @@ export default function ListingsGridPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-white flex flex-col font-sans">
-
       {/* Hero Banner */}
       <div className="relative w-full h-[500px] mb-12 overflow-hidden">
         <img
@@ -92,7 +73,6 @@ export default function ListingsGridPage() {
           alt="Circlo Hero"
           className="absolute inset-0 w-full h-full object-cover object-[50%_18%] z-0"
         />
-        
         {/* The white card overlay */}
         <div className="absolute left-8 md:left-[10%] top-1/2 -translate-y-1/2 bg-white rounded-xl p-8 shadow-xl max-w-sm z-10 border border-zinc-100">
           <h2 className="text-2xl font-black text-black mb-6 leading-tight">
@@ -114,31 +94,15 @@ export default function ListingsGridPage() {
 
       {/* Main Content */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 pb-12">
-
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-[#DC2626]" />
           </div>
-        ) : listings.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
-            {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-32 text-center">
-            <div className="h-20 w-20 bg-zinc-50 border border-zinc-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
-              <Filter className="h-8 w-8 text-zinc-300" />
-            </div>
-            <h3 className="text-xl font-bold text-black mb-2">No listings found</h3>
-            <p className="text-zinc-500 font-medium max-w-sm">
-              There are currently no items available in <span className="font-bold text-black">{CATEGORIES.find(c => c.id === activeCategory)?.label}</span>.
-            </p>
-            <Link href="/add-product">
-              <Button size="lg" className="mt-8 bg-[#DC2626] hover:bg-[#B91C1C] text-white font-bold rounded-full shadow-lg shadow-red-500/20">
-                Be the first to list one!
-              </Button>
-            </Link>
+          <div className="space-y-16">
+            <ProductSection title={<>For you <span className="text-red-600">!</span></>} listings={listings} />
+            <ProductSection title="Hot at UIC" listings={listings.slice().reverse()} />
+            <ProductSection title="You've viewed" listings={listings} />
           </div>
         )}
       </main>
@@ -146,12 +110,26 @@ export default function ListingsGridPage() {
   );
 }
 
-
+function ProductSection({ title, listings }: { title: React.ReactNode, listings: Listing[] }) {
+  if (listings.length === 0) return null;
+  return (
+    <section>
+      <h2 className="text-2xl font-bold text-black mb-6">{title}</h2>
+      <div className="flex overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 gap-4 md:gap-6 snap-x snap-mandatory hide-scrollbar">
+        {listings.map((listing) => (
+          <div key={listing.id} className="min-w-[160px] md:min-w-[240px] w-[160px] md:w-[240px] flex-none snap-start">
+            <ListingCard listing={listing} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function ListingCard({ listing }: { listing: Listing }) {
   return (
     <Link href={`/listings/${listing.id}`} className="block h-full group">
-      <motion.div
+      <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col h-full"
