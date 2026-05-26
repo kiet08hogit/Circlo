@@ -2,6 +2,7 @@ import { Controller, Get, Post, Param, Body, UseGuards } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { ClerkAuthGuard } from '../../common/guards/clerk-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { AuthUser } from '../../common/types/auth-user.type';
 @Controller('chat')
 export class ChatController {
     constructor(
@@ -12,16 +13,23 @@ export class ChatController {
     @Post('conversation/:otherUserId')
     @UseGuards(ClerkAuthGuard)
     async startConversation(
-        @CurrentUser() currentUser: { clerkUserId: string, email: string },
+        @CurrentUser() currentUser: AuthUser,
         @Param('otherUserId') otherUserId: string,
     ) {
         return this.chatService.getOrCreateConversation(currentUser.clerkUserId, otherUserId);
     }
 
+    @Get('unread-count')
+    @UseGuards(ClerkAuthGuard)
+    async getUnreadCount(@CurrentUser() currentUser: AuthUser) {
+        const count = await this.chatService.getUnreadCount(currentUser.clerkUserId);
+        return { count };
+    }
+
     // Get all conversations with latest message
     @Get('inbox')
     @UseGuards(ClerkAuthGuard)
-    async getInbox(@CurrentUser() currentUser: { clerkUserId: string, email: string }) {
+    async getInbox(@CurrentUser() currentUser: AuthUser) {
         return this.chatService.getUserInboxConversations(currentUser.clerkUserId);
     }
 
@@ -31,6 +39,8 @@ export class ChatController {
     async getConversation(@Param('id') id: string) {
         return this.chatService.getSpecificConversation(id);
     }
+
+
 
     // @Post('message/:conversationId')
     // @UseGuards(ClerkAuthGuard)

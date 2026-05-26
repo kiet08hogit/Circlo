@@ -5,6 +5,7 @@ import { ListingsService } from './listings.service';
 import { ClerkAuthGuard } from '../../common/guards/clerk-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import {CreateListingDto} from './create-listing.dto';
+import { AuthUser } from '../../common/types/auth-user.type';
 import { InteractionType, ListingCategory } from '@prisma/client';
 
 @Controller('listings')
@@ -14,7 +15,7 @@ export class ListingsController {
     @Post()
     @UseGuards(ClerkAuthGuard)
     @UseInterceptors(FilesInterceptor('images', 6))
-    async createListing(@CurrentUser() clerkUser: any, @Body() createListingDto: CreateListingDto, @UploadedFiles() files: any[])
+    async createListing(@CurrentUser() clerkUser: AuthUser, @Body() createListingDto: CreateListingDto, @UploadedFiles() files: any[])
      {
         console.log("Create listing request body:", createListingDto);
         console.log("Uploaded files:", files?.length);
@@ -23,7 +24,7 @@ export class ListingsController {
 
     @Get()
     @UseGuards(ClerkAuthGuard)
-    async getFeed(@CurrentUser() clerkUser: any) {
+    async getFeed(@CurrentUser() clerkUser: AuthUser) {
         return this.listingsService.getSwipeFeed(clerkUser.clerkUserId);
     }
 
@@ -36,14 +37,20 @@ export class ListingsController {
 
     @Post(':id/swipe')
     @UseGuards(ClerkAuthGuard)
-    async swipe(@CurrentUser() clerkUser: any, @Param('id') id: string, @Body() body: { type: InteractionType }) {
+    async swipe(@CurrentUser() clerkUser: AuthUser, @Param('id') id: string, @Body() body: { type: InteractionType }) {
         return this.listingsService.recordSwipe(clerkUser.clerkUserId, id, body.type);
     }
 
     @Get('my-listings')
     @UseGuards(ClerkAuthGuard)
-    async getMyListings(@CurrentUser() clerkUser: any) {
+    async getMyListings(@CurrentUser() clerkUser: AuthUser) {
         return this.listingsService.getUserListings(clerkUser.clerkUserId);
+    }
+
+    @Get('wishlist')
+    @UseGuards(ClerkAuthGuard)
+    async getWishlist(@CurrentUser() clerkUser: AuthUser) {
+        return this.listingsService.getWishlist(clerkUser.clerkUserId);
     }
 
     @Get(':id')
@@ -58,12 +65,12 @@ export class ListingsController {
     }
     @Delete(':id')
     @UseGuards(ClerkAuthGuard)
-    async deleteListing(@CurrentUser() clerkUser: any, @Param('id') id: string) {
+    async deleteListing(@CurrentUser() clerkUser: AuthUser, @Param('id') id: string) {
         return this.listingsService.deleteListing(clerkUser.clerkUserId, id);
     }
     @Put(':id')
     @UseGuards(ClerkAuthGuard)
-    async updateListing(@CurrentUser() clerkUser: any, @Param('id') id: string, @Body() updateListingDto: CreateListingDto) {
+    async updateListing(@CurrentUser() clerkUser: AuthUser, @Param('id') id: string, @Body() updateListingDto: CreateListingDto) {
         return this.listingsService.updateListing(clerkUser.clerkUserId, id, updateListingDto);
     }
 }

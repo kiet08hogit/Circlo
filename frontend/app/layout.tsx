@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { OnboardingCheck } from "@/components/OnboardingCheck";
 import { CustomUserButton } from "@/components/CustomUserButton";
 import { DeleteAccountButton } from "@/components/DeleteAccountButton";
+import { NavActions } from "@/components/NavActions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -94,9 +95,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                         + Create Listing
                       </Button>
                     </Link>
-                    <Link href="/chat" className="text-zinc-500 hover:text-white transition-colors">
-                      <MessageSquare className="h-5 w-5" />
-                    </Link>
+                    <NavActions />
               
                     <CustomUserButton />
                   </div>

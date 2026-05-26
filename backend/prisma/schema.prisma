@@ -188,5 +188,7 @@ model Message {
   senderId       String
   sender         User         @relation(fields: [senderId], references: [id])
 
+  isRead         Boolean      @default(false)
+
   createdAt      DateTime     @default(now())
 }

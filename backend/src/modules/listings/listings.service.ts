@@ -101,6 +101,7 @@ export class ListingsService {
             take: limit, // Only fetch a batch at a time (e.g. 10 cards)
             // Include the seller's profile info so the frontend can show who is selling it!
             include: {
+                images: true,
                 seller: {
                     select: { id: true, name: true, username: true, avatarUrl: true }
                 }
@@ -128,6 +129,30 @@ export class ListingsService {
             }
         });
     }
+    async getWishlist(clerkUserId: string) {
+        const dbUser = await this.prisma.user.findUnique({ where: { clerkUserId } });
+        if (!dbUser) throw new NotFoundException('User not found');
+
+        return this.prisma.listing.findMany({
+            where: {
+                status: 'ACTIVE',
+                interactions: {
+                    some: {
+                        userId: dbUser.id,
+                        type: 'LIKE'
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                images: true,
+                seller: {
+                    select: { id: true, name: true, username: true, avatarUrl: true }
+                }
+            }
+        });
+    }
+
     async deleteListing(clerkUserId: string, listingId: string) {
         const dbUser = await this.prisma.user.findUnique({ where: { clerkUserId } });
         if (!dbUser) throw new NotFoundException('User not found');

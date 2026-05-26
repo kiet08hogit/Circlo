@@ -95,8 +95,73 @@ export class ChatService {
     });
     }
 
-    // 
+    async getUnreadCount(clerkUserId: string) {
+        const user = await this.prisma.user.findUnique({ where: { clerkUserId } });
+        if (!user) throw new NotFoundException('User not found');
 
+        return this.prisma.message.count({
+            where: {
+                conversation: {
+                    members: { some: { userId: user.id } }
+                },
+                senderId: { not: user.id },
+                isRead: false
+            }
+        });
+    }
 
+    async createMessage(clerkUserId: string, conversationId: string, content: string) {
+        const dbUser = await this.prisma.user.findUnique({
+            where: { clerkUserId },
+        });
+        if (!dbUser) throw new NotFoundException('User not found');
 
+        const savedMessage = await this.prisma.message.create({
+            data: {
+                content,
+                conversationId,
+                senderId: dbUser.id,
+            },
+            include: {
+                sender: {
+                    select: { id: true, name: true, avatarUrl: true, clerkUserId: true }
+                }
+            }
+        });
+
+        await this.prisma.conversation.update({
+            where: { id: conversationId },
+            data: { updatedAt: new Date() },
+        });
+
+        const conversation = await this.prisma.conversation.findUnique({
+            where: { id: conversationId },
+            include: { members: { include: { user: true } } }
+        });
+
+        return { savedMessage, conversation };
+    }
+
+    async markConversationAsRead(clerkUserId: string, conversationId: string) {
+        const dbUser = await this.prisma.user.findUnique({
+            where: { clerkUserId },
+        });
+        if (!dbUser) throw new NotFoundException('User not found');
+
+        await this.prisma.message.updateMany({
+            where: {
+                conversationId,
+                senderId: { not: dbUser.id },
+                isRead: false
+            },
+            data: { isRead: true }
+        });
+
+        const conversation = await this.prisma.conversation.findUnique({
+            where: { id: conversationId },
+            include: { members: { include: { user: true } } }
+        });
+
+        return { dbUser, conversation };
+    }
 }

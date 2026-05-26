@@ -20,6 +20,8 @@ export default function ProfilePage() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
+  const [activeTab, setActiveTab] = useState<'listings' | 'wishlist'>('listings');
+  const [wishlist, setWishlist] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -38,7 +40,21 @@ export default function ProfilePage() {
       }
     };
     
+    const fetchWishlist = async () => {
+      if (!isLoaded || !isSignedIn) return;
+      try {
+        const token = await getToken();
+        const res = await axios.get(`http://localhost:3000/listings/wishlist`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setWishlist(res.data);
+      } catch (err) {
+        console.error('Failed to fetch wishlist', err);
+      }
+    };
+    
     fetchProfile();
+    fetchWishlist();
   }, [userId, isLoaded, isSignedIn, getToken]);
 
   if (!isLoaded || isLoading) {
@@ -225,10 +241,30 @@ export default function ProfilePage() {
             </motion.div>
           </div>
 
-          {/* Right Column: User's Listings */}
+          {/* Right Column: User's Listings & Wishlist */}
           <div className="lg:col-span-8">
-            <h2 className="text-2xl font-black tracking-tight text-black mb-6">Active Listings</h2>
             
+            {currentUserId === userProfile.clerkUserId ? (
+              <div className="flex gap-4 mb-6">
+                <button 
+                  onClick={() => setActiveTab('listings')}
+                  className={`text-2xl font-black tracking-tight pb-1 transition-colors ${activeTab === 'listings' ? 'text-black border-b-2 border-black' : 'text-zinc-400 hover:text-black'}`}
+                >
+                  Active Listings
+                </button>
+                <button 
+                  onClick={() => setActiveTab('wishlist')}
+                  className={`text-2xl font-black tracking-tight pb-1 transition-colors ${activeTab === 'wishlist' ? 'text-[#3252DF] border-b-2 border-[#3252DF]' : 'text-zinc-400 hover:text-[#3252DF]'}`}
+                >
+                  Wishlist
+                </button>
+              </div>
+            ) : (
+              <h2 className="text-2xl font-black tracking-tight text-black mb-6">Active Listings</h2>
+            )}
+            
+            {activeTab === 'listings' && (
+              <>
             {userProfile.listings && userProfile.listings.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {userProfile.listings.map((listing: any, i: number) => (
@@ -312,6 +348,75 @@ export default function ProfilePage() {
                 <h3 className="text-lg font-black text-black mb-1">No active listings</h3>
                 <p className="text-zinc-500 text-sm font-medium">This student doesn't have any items for sale right now.</p>
               </div>
+            )}
+              </>
+            )}
+
+            {activeTab === 'wishlist' && (
+              <>
+                {wishlist && wishlist.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {wishlist.map((listing: any, i: number) => (
+                      <motion.div 
+                        key={listing.id}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.05 }}
+                      >
+                        <Link href={`/listings/${listing.id}`} className="block h-full group">
+                          <div className="bg-white rounded-2xl overflow-hidden border border-zinc-200 shadow-sm hover:shadow-md transition-all h-full flex flex-col">
+                            {/* Image */}
+                            <div className="aspect-square bg-zinc-100 relative overflow-hidden">
+                              {listing.images && listing.images.length > 0 ? (
+                                <img 
+                                  src={`http://localhost:3000${listing.images[0].url}`} 
+                                  alt={listing.title} 
+                                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                />
+                              ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-zinc-300">
+                                  <Tag className="h-10 w-10" />
+                                </div>
+                              )}
+                              {/* Category Badge */}
+                              <div className="absolute top-3 left-3 flex flex-col gap-2">
+                                <span className="bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-md text-[10px] uppercase font-black tracking-wider text-black shadow-sm">
+                                  {listing.category}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Content */}
+                            <div className="p-4 flex flex-col flex-1">
+                              <div className="flex justify-between items-start mb-2">
+                                <h3 className="font-bold text-black text-sm leading-tight line-clamp-2 pr-2 group-hover:text-[#3252DF] transition-colors">
+                                  {listing.title}
+                                </h3>
+                              </div>
+                              <div className="mt-auto pt-3 flex items-end justify-between">
+                                <span className="text-lg font-black text-[#DC2626]">
+                                  ${Number(listing.price).toFixed(2)}
+                                </span>
+                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                  {new Date(listing.createdAt).toLocaleDateString()}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-zinc-200 p-12 flex flex-col items-center justify-center text-center shadow-sm">
+                    <div className="h-16 w-16 bg-zinc-50 rounded-full flex items-center justify-center mb-4 border border-zinc-100">
+                      <Heart className="h-8 w-8 text-zinc-300" />
+                    </div>
+                    <h3 className="text-lg font-black text-black mb-1">Your Wishlist is Empty</h3>
+                    <p className="text-zinc-500 text-sm font-medium">Items you swipe right on will appear here.</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

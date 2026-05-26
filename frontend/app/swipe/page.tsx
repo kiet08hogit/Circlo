@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from "framer-motion";
-import { X, Heart, Sparkles, AlertCircle, ShoppingBag, MapPin } from "lucide-react";
+import { X, Heart, Sparkles, AlertCircle, ShoppingBag, MapPin, Loader2 } from "lucide-react";
+import axios from "axios";
+import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,47 +26,29 @@ interface Listing {
   images?: { url: string }[];
 }
 
-const MOCK_LISTINGS: Listing[] = [
-  {
-    id: "1",
-    title: "Sony WH-1000XM4 Headphones",
-    description: "Barely used, bought them last semester but prefer earbuds. Comes with original case. Can meet up at the library.",
-    price: 150,
-    category: "ACCESSORIES",
-    seller: { id: "s1", name: "Alex Johnson", avatarUrl: "https://i.pravatar.cc/150?img=11" },
-    images: [{ url: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=800&q=80" }]
-  },
-  {
-    id: "2",
-    title: "Calculus Early Transcendentals",
-    description: "Required for MATH 180/181. Good condition, no highlighting or missing pages.",
-    price: 45,
-    category: "SCHOOL",
-    seller: { id: "s2", name: "Maria Garcia", avatarUrl: "https://i.pravatar.cc/150?img=5" },
-    images: [{ url: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&q=80" }]
-  },
-  {
-    id: "3",
-    title: "Dorm Mini Fridge",
-    description: "Moving out of JST and can't take this with me. Works perfectly, gets really cold. Pick up only.",
-    price: 60,
-    category: "HOUSING",
-    seller: { id: "s3", name: "David Kim", avatarUrl: "https://i.pravatar.cc/150?img=60" },
-    images: [{ url: "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=800&q=80" }]
-  },
-  {
-    id: "4",
-    title: "Vintage UIC Hoodie",
-    description: "Size Large. Super comfortable and thick material. Vintage design you can't find in the bookstore anymore.",
-    price: 25,
-    category: "CLOTHES",
-    seller: { id: "s4", name: "Sarah Chen", avatarUrl: "https://i.pravatar.cc/150?img=47" },
-    images: [{ url: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80" }]
-  }
-];
-
 export default function SwipePage() {
-  const [listings, setListings] = useState<Listing[]>(MOCK_LISTINGS);
+  const { getToken, isLoaded, isSignedIn } = useAuth();
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+    const fetchFeed = async () => {
+      try {
+        const token = await getToken();
+        const res = await axios.get("http://localhost:3000/listings", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setListings(res.data);
+      } catch (err) {
+        console.error("Failed to fetch swipe feed:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchFeed();
+  }, [isLoaded, isSignedIn, getToken]);
+
   const activeListing = listings[0];
   const nextListing = listings[1];
 
@@ -77,12 +61,23 @@ export default function SwipePage() {
   const likeOpacity = useTransform(x, [20, 100], [0, 1]);
   const nopeOpacity = useTransform(x, [-20, -100], [0, 1]);
 
-  const handleSwipe = (direction: "left" | "right") => {
+  const handleSwipe = async (direction: "left" | "right") => {
+    if (!activeListing) return;
+    const listingId = activeListing.id;
+    const interactionType = direction === "right" ? "LIKE" : "SKIP";
+
     // Optimistically remove the top card
     setListings((prev) => prev.slice(1));
     
-    // In a real implementation, make API call here
-    console.log(`Swiped ${direction} on ${activeListing?.title}`);
+    try {
+      const token = await getToken();
+      await axios.post(`http://localhost:3000/listings/${listingId}/swipe`, 
+        { type: interactionType }, 
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (err) {
+      console.error(`Failed to record ${interactionType} swipe:`, err);
+    }
   };
 
   const handleDragEnd = (event: any, info: PanInfo) => {
@@ -95,6 +90,14 @@ export default function SwipePage() {
       handleSwipe("left");
     }
   };
+
+  if (!isLoaded || isLoading) {
+    return (
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-zinc-50">
+        <Loader2 className="h-10 w-10 animate-spin text-[#3252DF]" />
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden bg-zinc-50 font-sans">
@@ -123,7 +126,7 @@ export default function SwipePage() {
                 >
                   <div className="relative flex-1 bg-zinc-100">
                     <img 
-                      src={nextListing.images?.[0]?.url || "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=800&q=80"} 
+                      src={nextListing.images && nextListing.images.length > 0 ? `http://localhost:3000${nextListing.images[0].url}` : "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=800&q=80"} 
                       alt="" 
                       className="absolute inset-0 h-full w-full object-cover"
                     />
@@ -178,7 +181,7 @@ export default function SwipePage() {
                 <div className="relative flex-1 bg-zinc-100 overflow-hidden">
                   {activeListing.images && activeListing.images.length > 0 ? (
                     <img 
-                      src={activeListing.images[0].url} 
+                      src={`http://localhost:3000${activeListing.images[0].url}`} 
                       alt={activeListing.title}
                       className="absolute inset-0 h-full w-full object-cover pointer-events-none"
                     />
@@ -241,9 +244,9 @@ export default function SwipePage() {
               <Button 
                 variant="outline" 
                 className="mt-6 font-bold rounded-full border-zinc-200"
-                onClick={() => setListings(MOCK_LISTINGS)}
+                onClick={() => window.location.reload()}
               >
-                Restart Demo
+                Refresh Feed
               </Button>
             </motion.div>
           )}

@@ -29,6 +29,7 @@ interface Message {
   senderId: string;
   createdAt: string;
   sender?: UserPreview;
+  isRead?: boolean;
 }
 
 interface Conversation {
@@ -112,6 +113,7 @@ export default function ChatPage() {
         const data = res.data;
         // The backend returns an array of messages directly
         setMessages(Array.isArray(data) ? data : []);
+
       } catch (err) {
         console.error("Failed to fetch messages:", err);
       } finally {
@@ -162,10 +164,19 @@ export default function ChatPage() {
   useEffect(() => {
     if (!socket) return;
 
+    // If we have an active chat, let the server know we're looking at it
+    if (activeConversationId) {
+      socket.emit("mark_read", { conversationId: activeConversationId });
+      window.dispatchEvent(new Event("update_unread_count"));
+    }
+
     const onReceiveMessage = (message: Message) => {
       // If it belongs to active chat, append it
       if (message.conversationId === activeConversationId) {
         setMessages((prev) => [...prev, message]);
+        // Also emit that we've read this new incoming message
+        socket.emit("mark_read", { conversationId: activeConversationId });
+        window.dispatchEvent(new Event("update_unread_count"));
       }
       
       // Update inbox preview to bump this conversation to top
@@ -190,10 +201,18 @@ export default function ChatPage() {
       });
     };
 
+    const onMessagesRead = (payload: { conversationId: string }) => {
+      if (payload.conversationId === activeConversationId) {
+        setMessages((prev) => prev.map(msg => ({ ...msg, isRead: true })));
+      }
+    };
+
     socket.on("receive_message", onReceiveMessage);
+    socket.on("messages_read", onMessagesRead);
 
     return () => {
       socket.off("receive_message", onReceiveMessage);
+      socket.off("messages_read", onMessagesRead);
     };
   }, [socket, activeConversationId]);
 
@@ -372,9 +391,16 @@ export default function ChatPage() {
                           >
                             {msg.content}
                           </div>
-                          <span className="text-[10px] text-zinc-400 mt-1 px-1">
-                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
-                          </span>
+                          <div className="flex items-center gap-1.5 mt-1 px-1">
+                            <span className="text-[10px] text-zinc-400">
+                              {new Date(msg.createdAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                            </span>
+                            {amISender && msg.isRead && (
+                              <span className="text-[10px] font-bold text-emerald-500 tracking-wide">
+                                • Seen
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </motion.div>
                     );

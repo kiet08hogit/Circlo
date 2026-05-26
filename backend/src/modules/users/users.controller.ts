@@ -3,6 +3,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 import { UsersService } from './users.service';
 import { ClerkAuthGuard } from '../../common/guards/clerk-auth.guard';
 import { CurrentUser} from '../../common/decorators/current-user.decorator';
+import { AuthUser } from '../../common/types/auth-user.type';
 
 @Controller('users')
 export class UsersController {
@@ -10,7 +11,7 @@ export class UsersController {
 
     @Get('me')
     @UseGuards(ClerkAuthGuard)
-    async getMe(@CurrentUser() clerkUser: any) {
+    async getMe(@CurrentUser() clerkUser: AuthUser) {
         const dbUser = await this.usersService.syncUser(
             clerkUser.clerkUserId,
             clerkUser.email,
@@ -20,7 +21,7 @@ export class UsersController {
 
     @Patch('me')
     @UseGuards(ClerkAuthGuard)
-    async updateProfile(@CurrentUser() clerkUser: any, @Body() updateData: any) {
+    async updateProfile(@CurrentUser() clerkUser: AuthUser, @Body() updateData: any) {
         try {
             return await this.usersService.updateUser(clerkUser.clerkUserId, updateData);
         } catch (error: any) {

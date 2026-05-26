@@ -111,6 +111,24 @@ export default function ListingDetailPage() {
     }
   };
 
+  const handleWishlistToggle = async () => {
+    if (!listing) return;
+    
+    const newValue = !isWishlisted;
+    setIsWishlisted(newValue);
+
+    try {
+      const token = await getToken();
+      await axios.post(`http://localhost:3000/listings/${listing.id}/swipe`, 
+        { type: newValue ? "LIKE" : "SKIP" }, 
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (err) {
+      console.error("Failed to update wishlist:", err);
+      setIsWishlisted(!newValue);
+    }
+  };
+
   if (!isLoaded || isLoading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-white">
@@ -372,7 +390,7 @@ export default function ListingDetailPage() {
                     <Button
                       size="lg"
                       variant="outline"
-                      onClick={() => setIsWishlisted(!isWishlisted)}
+                      onClick={handleWishlistToggle}
                       className={`font-bold h-11 rounded-lg border-zinc-200 text-sm transition-all ${isWishlisted
                           ? "bg-red-50 border-red-200 text-red-600 hover:bg-red-100 hover:text-red-700"
                           : "hover:border-zinc-300"
