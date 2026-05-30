@@ -2,7 +2,7 @@
 
 ## Product Summary
 
-Circlo is a verified marketplace and community platform for UIC students.
+Circlo is a verified marketplace and community platform for university students.
 
 Core features:
 - Buy and sell items
@@ -17,7 +17,7 @@ Core features:
 
 The first release is designed for approximately:
 
-- 20–50 UIC students
+- 20–50 university students
 - Single-region deployment
 - Simple, maintainable architecture
 - Room to scale later if usage grows
@@ -30,12 +30,12 @@ The system contains:
 
 ### Frontend
 - Next.js + TypeScript
-- Hosted on Azure Static Web Apps
+- Hosted on AWS Amplify (or Vercel)
 - Handles page rendering, UI, client-side interactions, and requests to the backend
 
 ### Backend
 - TypeScript backend API
-- Hosted on Azure App Service
+- Hosted on AWS ECS (Fargate) or App Runner
 - Handles:
   - REST API requests
   - Authentication middleware
@@ -45,10 +45,10 @@ The system contains:
 ### Authentication
 - Clerk for user sign-in and session management
 - Backend verifies Clerk JWTs
-- Users must have a `@uic.edu` email
+- Users must have a valid university email
 
 ### Database
-- Azure Database for PostgreSQL
+- Amazon RDS (PostgreSQL)
 - Stores:
   - Users
   - Listings
@@ -58,15 +58,15 @@ The system contains:
   - Messages
 
 ### File Storage
-- Azure Blob Storage
+- Amazon S3
 - Stores listing images and future uploaded files
 
-### Optional Future Cache
-- Azure Redis can be added later if read traffic grows
-- Possible cache targets:
-  - Popular listings
-  - Feed results
-  - Search results
+### Caching, Queues, & Scalability
+- Amazon ElastiCache (Redis)
+- Current features:
+  - Global API Rate Limiting (DDoS Protection)
+  - API Payload Caching (Low latency reads)
+  - Background Job Queueing (BullMQ) for async tasks
 
 ---
 
