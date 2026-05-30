@@ -1,15 +1,15 @@
 # Circlo 🔵
 
-**Circlo** is a verified marketplace exclusively for University of Illinois Chicago (UIC) students. It provides a safe, trusted platform to buy, sell, and swap items with other verified `@uic.edu` student profiles. 
+**Circlo** is a verified marketplace exclusively for university students. It provides a safe, trusted platform to buy, sell, and swap items with other verified student profiles using their university email addresses.
 
 ## ✨ Features
 
-- **Exclusive Access:** Powered by Clerk Authentication, restricting access solely to users with valid `@uic.edu` email addresses.
+- **Exclusive Access:** Powered by Clerk Authentication, restricting access solely to users with valid university email addresses.
 - **Categorized Listings:** Browse through dedicated categories like Dorm, Clothes, School, Leisure, and Accessories.
 - **Real-Time Chat:** Integrated messaging powered by WebSockets to negotiate and chat with sellers instantly.
 - **Match Your Needs:** A fun, interactive swipe feature to discover items you might be interested in.
 - **Interactive Maps:** Built-in Mapbox integration to view meetup locations on or around campus.
-- **Cloud Storage:** Fast, scalable image uploads utilizing Azure Blob Storage.
+- **Cloud Storage:** Fast, scalable image uploads utilizing Amazon S3.
 
 ## 🛠 Tech Stack
 
@@ -23,9 +23,11 @@
 
 ### Backend
 - **Framework:** [NestJS](https://nestjs.com/)
-- **Database:** PostgreSQL with [Prisma ORM](https://www.prisma.io/)
+- **Database:** PostgreSQL with [Prisma ORM](https://www.prisma.io/) (Amazon RDS)
+- **Caching & Message Queues:** Redis (Amazon ElastiCache) & BullMQ
+- **Rate Limiting:** Global Redis Throttler
 - **Real-Time:** Socket.io
-- **File Storage:** Azure Blob Storage
+- **File Storage:** Amazon S3
 - **Auth Verification:** Clerk Backend SDK
 
 ## 🚀 Getting Started
